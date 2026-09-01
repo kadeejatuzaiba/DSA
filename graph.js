@@ -83,3 +83,5 @@ let n=5
 let adjMatrix=Array.from({length:n},()=>Array(n).fill(0))
 adjMatrix[0][1]=1
 console.log(adjMatrix)
+
+
