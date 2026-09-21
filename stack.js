@@ -284,3 +284,277 @@ s.push(20)
 s.push(30)
 console.log(s.pop())
 s.print()
+
+
+
+
+
+//^ 1. Implement a Stack using an Array.
+
+class Stack {
+    constructor() {
+        this.stack=[]
+    }
+    push(data){
+        this.stack.push(data)
+    }
+    pop(){
+        this.stack.pop()
+    }
+    peak(){
+        return this.stack[this.stack.length-1]
+    }
+    print(){
+        console.log(this.stack)
+    }
+    // 3. Reverse a string using a stack.
+reverseStr(str) {
+    let stack = []
+
+    for (let char of str) {
+        stack.push(char)
+    }
+    let result = ''
+    while (stack.length > 0) {
+        result += stack.pop()
+    }
+    return result
+}
+}
+let s=new Stack()
+s.push(10)
+s.push(20)
+s.push(30)
+// s.pop()
+// console.log(s.peak())
+s.print()
+console.log(s.reverseStr('zaiba'))
+
+
+
+//^ 4. Check for balanced parentheses `()`, `{}`, `[]`. *(LeetCode #20)*
+// let str='({})()'
+// let stack=[]
+// let pair={
+//     ')':'(',
+//     '}':'{',
+//     ']':'['
+// }
+// for(let i=0;i<str.length;i++){
+//     if(str[i]==='{' ||str[i]==='['|| str[i]==='('){
+//         stack.push(str[i])
+//     }else{
+//         if(stack.pop()!==pair[str[i]]){
+//             console.log('not balanced')
+//             return;
+//         }
+//     }
+
+// }
+// console.log(stack.length===0?'balanced':'not balanced')
+
+
+//^ 5. Implement a MinStack that supports `push`, `pop`, `top`, and `getMin` in **O(1)** time. *(LeetCode #155)*
+
+// class Stack {
+//     constructor() {
+//         this.stack=[]
+//         this.minStack=[]
+//     }
+//     push(data){
+//         this.stack.push(data)
+//         if(this.minStack.length===0 || data<this.minStack[this.minStack.length-1]){
+//             this.minStack.push(data)
+//         }
+//     }
+//     pop(){
+//         let removed=this.stack.pop()
+//         if(removed===this.minStack[this.minStack.length-1]){
+//             this.minStack.pop()
+//         }
+//     }
+//     top(){
+//         return this.stack[this.stack.length-1]
+//     }
+//     getMin(){
+//        return this.minStack[this.minStack.length-1]
+//     }
+// }
+
+// let stack=new Stack()
+// stack.push(10)
+// stack.push(4)
+// stack.push(44)
+// stack.pop()
+// console.log(stack.top())
+// console.log(stack.getMin())
+// console.log(stack.stack)
+
+
+//^ 6. Reverse a stack using recursion without using extra space apart from the call stack.
+
+// class Stack{
+//     constructor(){
+//         this.stack=[]
+//     }
+//     push(data){
+//         this.stack.push(data)
+//     }
+//     pop(){
+//         this.stack.pop()
+//     }
+//     reverseStack(){
+//         if(this.stack.length===0){
+//             return 
+//         }
+//         let top=this.stack.pop()
+//         this.reverseStack(this.stack)
+//         this.insertAtBottom(this.stack,top)
+//     }
+//      insertAtBottom(stack,value){
+//         if(stack.length===0){
+//             this.stack.push(value)
+//             return 
+//         }
+//          let top=this.stack.pop()
+//          this.insertAtBottom(this.stack,value)
+//          this.stack.push(top)
+//     }
+// }
+
+// let stack=new Stack()
+// stack.push(10)
+// stack.push(20)
+// stack.push(30)
+// stack.reverseStack()
+// console.log(stack.stack)
+
+
+//^ 7. Sort a stack using a temporary stack.
+// class Stack {
+//     constructor() {
+//         this.stack = []
+//     }
+
+//     push(data) {
+//         this.stack.push(data)
+//     }
+
+//     pop() {
+//         return this.stack.pop()
+//     }
+
+//     sortStack() {
+//         let temp=[]
+//         while(this.stack.length>0){
+//             let top=this.pop()
+//             while(temp.length>0&&temp[temp.length-1]>top){
+//                 this.stack.push(temp.pop())
+//             }
+//             temp.push(top)
+//         }
+//         this.stack=temp
+//     }
+// }
+
+// let stack = new Stack()
+
+// stack.push(3)
+// stack.push(1)
+// stack.push(4)
+// stack.push(2)
+
+// stack.sortStack()
+
+// console.log(stack.stack)
+
+//^ 8. Implement a stack that rejects duplicate values on `push`.
+// class Stack {
+//     constructor() {
+//         this.stack = []
+//     }
+
+//     push(data) {
+
+//         if (this.stack.includes(data)) {
+//             console.log("Duplicate value is not allowed")
+//             return
+//         }
+
+//         this.stack.push(data)
+//     }
+
+//     pop() {
+//         return this.stack.pop()
+//     }
+
+//     top() {
+//         return this.stack[this.stack.length - 1]
+//     }
+// }
+
+// let stack = new Stack()
+
+// stack.push(10)
+// stack.push(20)
+// stack.push(30)
+// stack.push(20)
+
+// console.log(stack.stack)
+
+
+//^ 9. Implement Undo-Redo functionality for a text editor using two stacks.-padichittilla
+// let text = ""
+// let undoStack = []
+// let redoStack = []
+
+// function type(data) {
+//     undoStack.push(text)
+//     text += data
+//     redoStack = []
+// }
+
+// function undo() {
+//     if (undoStack.length === 0) return
+
+//     redoStack.push(text)
+//     text = undoStack.pop()
+// }
+
+// function redo() {
+//     if (redoStack.length === 0) return
+
+//     undoStack.push(text)
+//     text = redoStack.pop()
+// }
+
+// type("I ")
+// type("am ")
+// type("Zaiba")
+
+// console.log(text)
+
+// undo()
+// console.log(text)
+
+// redo()
+// console.log(text)
+
+
+//^ 10. Check if a string is a palindrome using a stack.
+// let str='madam'
+// function isPal(str) {
+//     let stack=[]
+// for(let ch of str){
+//     stack.push(ch)
+// }
+// for(let ch of stack){
+//     if(ch!==stack.pop()){
+//         return 'no palindrom'
+//     }
+// }
+//     return 'palindrom'
+// }
+// console.log(isPal(str))
+
+//^ 11. Next Greater Element using the Monotonic Stack pattern.
