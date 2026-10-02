@@ -22,8 +22,8 @@ erDiagram
         uuid id PK
         uuid company_id FK
         varchar name
-        varchar email UK
-        varchar phone UK
+        varchar email
+        varchar phone
         varchar password_hash
         varchar role
         varchar status
@@ -33,7 +33,7 @@ erDiagram
 
     drivers {
         uuid id PK
-        uuid user_id FK UK
+        uuid user_id FK
         varchar full_name
         varchar phone
         date date_of_birth
@@ -69,7 +69,7 @@ erDiagram
 
     vehicles {
         uuid id PK
-        varchar registration_number UK
+        varchar registration_number
         varchar vehicle_type
         varchar model
         varchar capacity
@@ -102,8 +102,8 @@ erDiagram
 
     trips {
         uuid id PK
-        varchar trip_number UK
-        uuid order_id FK UK
+        varchar trip_number
+        uuid order_id FK
         uuid company_id FK
         uuid driver_id FK
         uuid vehicle_id FK
@@ -156,7 +156,7 @@ erDiagram
 
     trip_payroll_records {
         uuid id PK
-        uuid trip_id FK UK
+        uuid trip_id FK
         uuid driver_id FK
         uuid company_id FK
         decimal trip_amount
@@ -172,7 +172,7 @@ erDiagram
 
     wallets {
         uuid id PK
-        uuid driver_id FK UK
+        uuid driver_id FK
         decimal balance
         timestamp created_at
         timestamp updated_at
@@ -182,8 +182,8 @@ erDiagram
         uuid id PK
         uuid wallet_id FK
         uuid driver_id FK
-        uuid trip_id FK UK
-        uuid payroll_record_id FK UK
+        uuid trip_id FK
+        uuid payroll_record_id FK
         varchar transaction_type
         decimal amount
         varchar reference
@@ -208,7 +208,7 @@ erDiagram
     statement_items {
         uuid id PK
         uuid statement_id FK
-        uuid payroll_record_id FK UK
+        uuid payroll_record_id FK
         uuid trip_id FK
         decimal trip_amount
         decimal driver_percentage
@@ -251,90 +251,73 @@ erDiagram
     }
 
 
-    %% ============================================
-    %% COMPANY & USER RELATIONSHIPS
-    %% ============================================
+    %% Company and User Relationships
 
-    companies ||--o{ users : "has"
-    companies ||--o{ orders : "receives"
-    companies ||--o{ trips : "owns"
-    companies ||--o{ trip_payroll_records : "has"
-    companies ||--o{ statements : "has"
+    companies ||--o{ users : has
+    companies ||--o{ orders : receives
+    companies ||--o{ trips : owns
+    companies ||--o{ trip_payroll_records : has
+    companies ||--o{ statements : has
 
 
-    %% ============================================
-    %% DRIVER RELATIONSHIPS
-    %% ============================================
+    %% Driver Relationships
 
-    users ||--o| drivers : "has"
-    drivers ||--o{ driver_documents : "has"
-    drivers ||--o{ driver_availability : "has"
-    drivers ||--o{ trips : "assigned to"
-    drivers ||--o{ trip_assignments : "assigned"
-    drivers ||--o{ expenses : "records"
-    drivers ||--o{ trip_payroll_records : "earns"
-    drivers ||--o| wallets : "owns"
-    drivers ||--o{ wallet_transactions : "receives"
+    users ||--o| drivers : has
+    drivers ||--o{ driver_documents : has
+    drivers ||--o{ driver_availability : has
+    drivers ||--o{ trips : assigned
+    drivers ||--o{ trip_assignments : assigned
+    drivers ||--o{ expenses : records
+    drivers ||--o{ trip_payroll_records : earns
+    drivers ||--o| wallets : owns
+    drivers ||--o{ wallet_transactions : receives
 
 
-    %% ============================================
-    %% ORDER RELATIONSHIPS
-    %% ============================================
+    %% Order Relationships
 
-    users ||--o{ orders : "creates"
-    users ||--o{ orders : "accepts"
-    users ||--o{ orders : "rejects"
+    users ||--o{ orders : creates
+    users ||--o{ orders : accepts
+    users ||--o{ orders : rejects
 
-    orders ||--o| trips : "creates"
+    orders ||--o| trips : creates
 
 
-    %% ============================================
-    %% VEHICLE & TRIP RELATIONSHIPS
-    %% ============================================
+    %% Vehicle and Trip Relationships
 
-    vehicles ||--o{ trips : "used for"
-    vehicles ||--o{ trip_assignments : "assigned"
+    vehicles ||--o{ trips : used_for
+    vehicles ||--o{ trip_assignments : assigned
 
-    trips ||--o{ trip_assignments : "has"
-    trips ||--o{ trip_events : "has"
-    trips ||--o{ expenses : "has"
-    trips ||--o| trip_payroll_records : "generates"
+    trips ||--o{ trip_assignments : has
+    trips ||--o{ trip_events : has
+    trips ||--o{ expenses : has
+    trips ||--o| trip_payroll_records : generates
 
 
-    %% ============================================
-    %% TRIP EVENT RELATIONSHIPS
-    %% ============================================
+    %% Trip Event Relationships
 
-    users ||--o{ trip_events : "performs"
+    users ||--o{ trip_events : performs
 
 
-    %% ============================================
-    %% WALLET RELATIONSHIPS
-    %% ============================================
+    %% Wallet Relationships
 
-    wallets ||--o{ wallet_transactions : "contains"
-
-    trip_payroll_records ||--o| wallet_transactions : "creates"
+    wallets ||--o{ wallet_transactions : contains
+    trip_payroll_records ||--o| wallet_transactions : creates
 
 
-    %% ============================================
-    %% STATEMENT RELATIONSHIPS
-    %% ============================================
+    %% Statement Relationships
 
-    users ||--o{ statements : "creates"
+    users ||--o{ statements : creates
 
-    statements ||--o{ statement_items : "contains"
-    statements ||--o{ statement_verifications : "has"
+    statements ||--o{ statement_items : contains
+    statements ||--o{ statement_verifications : has
 
-    trip_payroll_records ||--o{ statement_items : "included in"
-    trips ||--o{ statement_items : "included in"
+    trip_payroll_records ||--o| statement_items : included_in
+    trips ||--o{ statement_items : included_in
 
-    users ||--o{ statement_verifications : "verifies"
+    users ||--o{ statement_verifications : verifies
 
 
-    %% ============================================
-    %% SYSTEM RELATIONSHIPS
-    %% ============================================
+    %% System Relationships
 
-    users ||--o{ notifications : "receives"
-    users ||--o{ audit_logs : "creates"
+    users ||--o{ notifications : receives
+    users ||--o{ audit_logs : creates
