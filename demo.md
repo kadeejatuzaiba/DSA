@@ -1,246 +1,340 @@
-# HireD — Entity Relationship Diagram
+# ER Diagram
 
-## 1. Overview
-
-This document describes the main entities in the HireD database and their relationships.
-
-The database uses **PostgreSQL** with a relational data model.
-
----
-
-## 2. ER Diagram
+This Entity Relationship Diagram represents the database structure of the HireD Phase 1 MVP.
 
 ```mermaid
 erDiagram
 
-    COMPANIES ||--o{ USERS : has
-    COMPANIES ||--o{ ORDERS : creates
-    COMPANIES ||--o{ STATEMENTS : receives
-
-    USERS ||--o| DRIVERS : "can be"
-
-    ORDERS ||--o{ TRIPS : contains
-
-    DRIVERS ||--o{ TRIPS : assigned
-    VEHICLES ||--o{ TRIPS : used
-
-    TRIPS ||--o{ EXPENSES : has
-    DRIVERS ||--o{ PAYROLL : receives
-    DRIVERS ||--o{ WALLET : owns
-
-    USERS ||--o{ AUDIT_LOGS : creates
-
-    COMPANIES {
+    companies {
         uuid id PK
-        string name
-        string status
+        varchar name
+        varchar email
+        varchar phone
+        text address
+        decimal driver_percentage
+        decimal company_percentage
+        varchar status
         timestamp created_at
         timestamp updated_at
     }
 
-    USERS {
+    users {
         uuid id PK
         uuid company_id FK
-        string name
-        string email
-        string role
-        string status
+        varchar name
+        varchar email UK
+        varchar phone UK
+        varchar password_hash
+        varchar role
+        varchar status
         timestamp created_at
         timestamp updated_at
     }
 
-    DRIVERS {
+    drivers {
         uuid id PK
-        uuid user_id FK
-        string status
+        uuid user_id FK UK
+        varchar full_name
+        varchar phone
+        date date_of_birth
+        text address
+        varchar onboarding_status
+        varchar availability_status
         timestamp created_at
         timestamp updated_at
     }
 
-    VEHICLES {
+    driver_documents {
         uuid id PK
-        string vehicle_number
-        string type
-        string status
-        timestamp created_at
+        uuid driver_id FK
+        varchar document_type
+        varchar document_number
+        varchar file_url
+        varchar status
+        timestamp expires_at
+        timestamp uploaded_at
+        timestamp updated_at
     }
 
-    ORDERS {
+    driver_availability {
+        uuid id PK
+        uuid driver_id FK
+        date availability_date
+        boolean is_available
+        timestamp start_time
+        timestamp end_time
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    vehicles {
+        uuid id PK
+        varchar registration_number UK
+        varchar vehicle_type
+        varchar model
+        varchar capacity
+        varchar status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    orders {
         uuid id PK
         uuid company_id FK
-        string status
-        string pickup_location
-        string drop_location
+        uuid created_by FK
+        varchar source
+        varchar pickup_location
+        varchar drop_location
+        timestamp requested_datetime
+        varchar vehicle_type
+        text service_notes
+        varchar contact_name
+        varchar contact_phone
+        varchar status
+        text rejection_reason
+        uuid accepted_by FK
+        timestamp accepted_at
+        uuid rejected_by FK
+        timestamp rejected_at
         timestamp created_at
         timestamp updated_at
     }
 
-    TRIPS {
+    trips {
         uuid id PK
-        uuid order_id FK
+        varchar trip_number UK
+        uuid order_id FK UK
+        uuid company_id FK
         uuid driver_id FK
         uuid vehicle_id FK
-        string status
+        varchar pickup_location
+        varchar drop_location
+        timestamp scheduled_at
+        integer estimated_duration_minutes
+        decimal estimated_distance_km
+        decimal trip_amount
+        varchar status
+        varchar selfie_url
+        varchar otp_hash
+        timestamp otp_expires_at
         timestamp started_at
-        timestamp completed_at
+        timestamp closed_at
         timestamp created_at
+        timestamp updated_at
     }
 
-    EXPENSES {
+    trip_assignments {
         uuid id PK
         uuid trip_id FK
-        decimal amount
-        string description
-        timestamp created_at
-    }
-
-    PAYROLL {
-        uuid id PK
         uuid driver_id FK
-        decimal amount
-        string period
-        string status
-        timestamp created_at
+        uuid vehicle_id FK
+        uuid assigned_by FK
+        timestamp assigned_at
+        timestamp unassigned_at
+        text reason
     }
 
-    WALLET {
+    trip_events {
         uuid id PK
-        uuid driver_id FK
-        string type
-        decimal amount
-        string reference
+        uuid trip_id FK
+        varchar event_type
+        uuid performed_by FK
+        json metadata
         timestamp created_at
     }
 
-    STATEMENTS {
+    expenses {
+        uuid id PK
+        uuid trip_id FK
+        uuid driver_id FK
+        varchar category
+        decimal amount
+        text description
+        varchar receipt_url
+        timestamp created_at
+    }
+
+    trip_payroll_records {
+        uuid id PK
+        uuid trip_id FK UK
+        uuid driver_id FK
+        uuid company_id FK
+        decimal trip_amount
+        decimal applied_driver_percentage
+        decimal applied_company_percentage
+        decimal driver_share
+        decimal company_share
+        varchar payout_status
+        timestamp calculated_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    wallets {
+        uuid id PK
+        uuid driver_id FK UK
+        decimal balance
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    wallet_transactions {
+        uuid id PK
+        uuid wallet_id FK
+        uuid driver_id FK
+        uuid trip_id FK UK
+        uuid payroll_record_id FK UK
+        varchar transaction_type
+        decimal amount
+        varchar reference
+        timestamp created_at
+    }
+
+    statements {
         uuid id PK
         uuid company_id FK
-        string period
-        string status
+        date period_start
+        date period_end
+        decimal total_trip_amount
+        decimal total_driver_share
+        decimal total_company_share
+        varchar status
+        uuid created_by FK
+        timestamp created_at
+        timestamp verified_at
         timestamp published_at
+    }
+
+    statement_items {
+        uuid id PK
+        uuid statement_id FK
+        uuid payroll_record_id FK UK
+        uuid trip_id FK
+        decimal trip_amount
+        decimal driver_percentage
+        decimal company_percentage
+        decimal driver_share
+        decimal company_share
         timestamp created_at
     }
 
-    AUDIT_LOGS {
+    statement_verifications {
+        uuid id PK
+        uuid statement_id FK
+        uuid admin_id FK
+        varchar verification_type
+        timestamp verified_at
+        text comments
+    }
+
+    notifications {
         uuid id PK
         uuid user_id FK
-        string action
-        string entity
-        uuid entity_id
+        varchar title
+        text message
+        varchar type
+        boolean is_read
+        timestamp read_at
         timestamp created_at
     }
-```
 
----
+    audit_logs {
+        uuid id PK
+        uuid user_id FK
+        varchar action
+        varchar entity_type
+        uuid entity_id
+        json old_values
+        json new_values
+        varchar ip_address
+        timestamp created_at
+    }
 
-## 3. Main Relationships
 
-| Relationship | Description |
-|---|---|
-| Company → Users | A company can have multiple users |
-| Company → Orders | A company can create multiple orders |
-| Company → Statements | A company can have multiple statements |
-| User → Driver | A user can be associated with a driver |
-| Order → Trips | An order can have one or more trips |
-| Driver → Trips | A driver can be assigned to multiple trips |
-| Vehicle → Trips | A vehicle can be used for multiple trips |
-| Trip → Expenses | A trip can have multiple expenses |
-| Driver → Payroll | A driver can have multiple payroll records |
-| Driver → Wallet | A driver can have wallet transactions |
-| User → Audit Logs | User actions can be recorded in audit logs |
+    %% ============================================
+    %% COMPANY & USER RELATIONSHIPS
+    %% ============================================
 
----
+    companies ||--o{ users : "has"
+    companies ||--o{ orders : "receives"
+    companies ||--o{ trips : "owns"
+    companies ||--o{ trip_payroll_records : "has"
+    companies ||--o{ statements : "has"
 
-## 4. Core Data Flow
 
-```text
-Company
-   |
-   +── Users
-   |
-   +── Orders
-          |
-          +── Trips
-                 |
-                 +── Driver
-                 |
-                 +── Vehicle
-                 |
-                 +── Expenses
-                 |
-                 +── Payroll
-                 |
-                 +── Wallet
-          |
-          +── Statement
-```
+    %% ============================================
+    %% DRIVER RELATIONSHIPS
+    %% ============================================
 
----
+    users ||--o| drivers : "has"
+    drivers ||--o{ driver_documents : "has"
+    drivers ||--o{ driver_availability : "has"
+    drivers ||--o{ trips : "assigned to"
+    drivers ||--o{ trip_assignments : "assigned"
+    drivers ||--o{ expenses : "records"
+    drivers ||--o{ trip_payroll_records : "earns"
+    drivers ||--o| wallets : "owns"
+    drivers ||--o{ wallet_transactions : "receives"
 
-## 5. Relationship Rules
 
-### Company
+    %% ============================================
+    %% ORDER RELATIONSHIPS
+    %% ============================================
 
-A company can have multiple users, orders, and statements.
+    users ||--o{ orders : "creates"
+    users ||--o{ orders : "accepts"
+    users ||--o{ orders : "rejects"
 
-### Order
+    orders ||--o| trips : "creates"
 
-An order belongs to a company and is associated with trip information.
 
-### Trip
+    %% ============================================
+    %% VEHICLE & TRIP RELATIONSHIPS
+    %% ============================================
 
-A trip connects an order with a driver and vehicle.
+    vehicles ||--o{ trips : "used for"
+    vehicles ||--o{ trip_assignments : "assigned"
 
-### Driver
+    trips ||--o{ trip_assignments : "has"
+    trips ||--o{ trip_events : "has"
+    trips ||--o{ expenses : "has"
+    trips ||--o| trip_payroll_records : "generates"
 
-A driver can have multiple trips and payroll records.
 
-### Vehicle
+    %% ============================================
+    %% TRIP EVENT RELATIONSHIPS
+    %% ============================================
 
-A vehicle can be assigned to multiple trips over time.
+    users ||--o{ trip_events : "performs"
 
-### Expense
 
-Expenses are associated with a specific trip.
+    %% ============================================
+    %% WALLET RELATIONSHIPS
+    %% ============================================
 
-### Payroll
+    wallets ||--o{ wallet_transactions : "contains"
 
-Payroll records are associated with a driver.
+    trip_payroll_records ||--o| wallet_transactions : "creates"
 
-### Wallet
 
-Wallet records maintain driver-related financial transactions.
+    %% ============================================
+    %% STATEMENT RELATIONSHIPS
+    %% ============================================
 
-### Statement
+    users ||--o{ statements : "creates"
 
-Statements are generated for a company for a specific period.
+    statements ||--o{ statement_items : "contains"
+    statements ||--o{ statement_verifications : "has"
 
-### Audit Log
+    trip_payroll_records ||--o{ statement_items : "included in"
+    trips ||--o{ statement_items : "included in"
 
-Audit logs record important user actions within the system.
+    users ||--o{ statement_verifications : "verifies"
 
----
 
-## 6. Data Integrity
+    %% ============================================
+    %% SYSTEM RELATIONSHIPS
+    %% ============================================
 
-The relationships are maintained using:
-
-- Primary keys
-- Foreign keys
-- Unique constraints
-- Not-null constraints
-- Database transactions where required
-
-Foreign keys prevent records from referencing non-existing entities.
-
----
-
-## 7. Source of Truth
-
-The actual database schema is the source of truth for this diagram.
-
-Any schema changes should also update:
-
-- `database.md`
-- `er-diagram.md`
-- Related backend models/migrations
+    users ||--o{ notifications : "receives"
+    users ||--o{ audit_logs : "creates"
